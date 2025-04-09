@@ -3,11 +3,12 @@ name: Update Agent List
 on:
   schedule:
     - cron: '0 3 * * *'  # Runs every day at 3am UTC
-  workflow_dispatch:      # Optional manual run
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -18,7 +19,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install axios jsdom
+        run: npm install
 
       - name: Run scraper
         run: node scraper/scrape-agents.js
