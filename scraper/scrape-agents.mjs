@@ -1,25 +1,24 @@
-const fs = require('fs');
-const axios = require('axios');
-const { JSDOM } = require('jsdom');
+import fs from "fs";
+import axios from "axios";
+import { JSDOM } from "jsdom";
 
-const baseUrl = 'https://www.remaxmtnview.ca/agents.php?page=';
-const baseProfileUrl = 'https://www.remaxmtnview.ca';
-const outputFile = './agents.json';
+const baseUrl = "https://www.remaxmtnview.ca/agents.php?page=";
+const baseProfileUrl = "https://www.remaxmtnview.ca";
+const outputFile = "agents.json";
 
 async function fetchAgentsFromPage(pageNum) {
   const res = await axios.get(`${baseUrl}${pageNum}`);
   const dom = new JSDOM(res.data);
   const document = dom.window.document;
 
-  const boxes = [...document.querySelectorAll('.listing-box-image')];
-  const agents = boxes.map(box => {
-    const img = box.querySelector('img');
-    const link = box.querySelector('a');
-
+  const boxes = [...document.querySelectorAll(".listing-box-image")];
+  const agents = boxes.map((box) => {
+    const img = box.querySelector("img");
+    const link = box.querySelector("a");
     return {
-      name: link?.getAttribute('aria-label') || 'RE/MAX Agent',
-      photo: img?.src || '',
-      link: link ? new URL(link.getAttribute('href'), baseProfileUrl).href : '#'
+      name: link?.getAttribute("aria-label") || "RE/MAX Agent",
+      photo: img?.src || "",
+      link: link ? new URL(link.getAttribute("href"), baseProfileUrl).href : "#",
     };
   });
 
@@ -29,7 +28,6 @@ async function fetchAgentsFromPage(pageNum) {
 async function scrapeAllAgents(maxPages = 10) {
   let allAgents = [];
   for (let page = 1; page <= maxPages; page++) {
-    console.log(`Scraping page ${page}`);
     const agents = await fetchAgentsFromPage(page);
     if (agents.length === 0) break;
     allAgents = [...allAgents, ...agents];
@@ -39,4 +37,6 @@ async function scrapeAllAgents(maxPages = 10) {
   console.log(`Saved ${allAgents.length} agents to ${outputFile}`);
 }
 
-scrapeAllAgents().catch(err => console.error('Scrape failed:', err));
+scrapeAllAgents().catch((err) => {
+  console.error("Scrape failed:", err);
+});

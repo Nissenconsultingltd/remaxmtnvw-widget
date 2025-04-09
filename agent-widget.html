@@ -1,54 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>RE/MAX Agent Widget</title>
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 1em;
-      border: 1px solid #ccc;
-      max-width: 300px;
-    }
-    img {
-      max-width: 100%;
-      border-radius: 8px;
-    }
+    body { font-family: sans-serif; margin: 0; padding: 1em; border: 1px solid #ccc; max-width: 300px; }
+    img { max-width: 100%; border-radius: 8px; }
+    a { color: #005eb8; font-weight: bold; text-decoration: none; }
   </style>
 </head>
 <body>
   <div id="random-agent-widget">
     <strong>Loading agent...</strong>
   </div>
-
   <script>
-    fetch('https://www.remaxmtnview.ca/agents.php?page=1')
-      .then(res => res.text())
-      .then(html => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const agentBoxes = [...doc.querySelectorAll('.listing-box-image')];
-
-        if (agentBoxes.length === 0) throw new Error('No agent boxes found.');
-
-        const randomBox = agentBoxes[Math.floor(Math.random() * agentBoxes.length)];
-        const img = randomBox.querySelector('img');
-        const link = randomBox.querySelector('a');
-
-        const photo = img?.src || 'https://www.remaxmtnview.ca/images/default-agent.png';
-        const name = link?.getAttribute('aria-label') || 'RE/MAX Agent';
-        const profile = link?.href ? new URL(link.getAttribute('href'), 'https://www.remaxmtnview.ca').href : '#';
-
+    fetch('https://nissenconsultingltd.github.io/remaxmtnvw-widget/agents.json')
+      .then(res => res.json())
+      .then(agents => {
+        if (!Array.isArray(agents) || agents.length === 0) throw new Error('No agents found.');
+        const agent = agents[Math.floor(Math.random() * agents.length)];
         document.getElementById('random-agent-widget').innerHTML = `
           <h3>Meet an Agent</h3>
-          <img src="${photo}" alt="${name}">
-          <p><strong>${name}</strong></p>
-          <a href="${profile}" target="_blank">View Profile</a>
+          <img src="${agent.photo}" alt="${agent.name}">
+          <p><strong>${agent.name}</strong></p>
+          <a href="${agent.link}" target="_blank">View Profile</a>
         `;
       })
       .catch(err => {
-        console.error(err);
+        console.error('Widget error:', err);
         document.getElementById('random-agent-widget').textContent = 'Could not load agent.';
       });
   </script>
